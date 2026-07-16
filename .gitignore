@@ -1,0 +1,7 @@
+datasets/
+pose_sessions/*.jsonl
+*.png
+__pycache__/
+*.pyc
+.venv/
+venv/
