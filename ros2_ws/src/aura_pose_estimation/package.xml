@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>aura_pose_estimation</name>
+  <version>0.0.1</version>
+  <description>Pose estimation and fall detection nodes for the Aura project: RealSense depth + YOLO pose keypoints, floor-plane-based height detection as the primary fall signal, torso angle as a confirmation check.</description>
+  <maintainer email="patelaarav2006@gmail.com">Aaran Patel</maintainer>
+  <license>TODO: License declaration</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>aura_pose_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
