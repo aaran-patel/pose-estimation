@@ -1,5 +1,5 @@
 """
-Borrows the *pattern* from Liam McKenna's main.py, but we use 3D depth for the Torso instead of 2D
+Borrows the pattern from Liam's main.py, but we use 3D depth for the Torso instead of 2D
 """
 
 import time
@@ -59,11 +59,7 @@ def deproject_pixel(depth_frame, intrinsics, x, y, patch=2):
 
 
 def torso_angle_from_vertical(kp_xy, kp_conf, depth_frame, intrinsics, conf_thresh=0.3):
-    """
-    Simplified single-value version: average left/right shoulder->hip
-    angle from vertical, using whichever side has valid depth+confidence.
-    Returns None if nothing usable this frame.
-    """
+  
     angles = []
     for side in ("left", "right"):
         sh_i = KP_INDEX[f"{side}_shoulder"]
@@ -89,12 +85,7 @@ def torso_angle_from_vertical(kp_xy, kp_conf, depth_frame, intrinsics, conf_thre
 
 
 def send_alert(message):
-    """
-    Placeholder alert channel -- console + timestamp for now. Swap this
-    for a Telegram call (reusing the pattern from Liam's send_tg_photo)
-    once the two-state logic itself is validated. Kept as its own
-    function specifically so that swap is a one-function change later.
-    """
+   
     ts = time.strftime("%H:%M:%S")
     print(f"[ALERT {ts}] {message}")
 
