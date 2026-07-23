@@ -1,21 +1,5 @@
 """
-live_fall_alert.py
-
-INCREMENT 1: the simplest possible live fall detector. Two states only --
-STANDING or FALL DETECTED -- shown directly on the camera feed, with a
-console alert when a fall is confirmed. Deliberately does NOT include the
-knee-bend / bend-vs-fall distinction from pose_classifier.py yet -- that's
-a later increment. This one just answers: is the torso upright or down,
-sustained over time.
-
-Borrows the *pattern* from Liam McKenna's main.py (frame-counter based
-confirmation, on-screen state label, alert cooldown) but uses the 3D
-torso angle from the depth stream instead of his 2D box-ratio, since
-that's already built and working here.
-
-Run:
-    python live_fall_alert.py
-    (press 'q' in the video window to quit)
+Borrows the *pattern* from Liam McKenna's main.py, but we use 3D depth for the Torso instead of 2D
 """
 
 import time
@@ -26,9 +10,6 @@ import numpy as np
 import pyrealsense2 as rs
 from ultralytics import YOLO
 
-# ---------------------------------------------------------------------------
-# Config -- same style as Liam's system: simple constants, tune as needed
-# ---------------------------------------------------------------------------
 
 POSE_MODEL_PATH = "yolo11n-pose.pt"
 TORSO_FALLEN_DEG = 65.0     # torso angle-from-vertical considered "down"
@@ -174,7 +155,7 @@ def main():
             else:
                 fall_confirmed = False
 
-            # --- On-screen overlay, Liam-style ---
+          
             color = (0, 0, 255) if state_this_frame == "FALL DETECTED" else (0, 200, 0)
             cv2.putText(annotated, state_this_frame, (30, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 3)
