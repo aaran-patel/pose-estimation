@@ -1,5 +1,5 @@
 """
-Borrows the *pattern* from Liam McKenna's main.py, but we use 3D depth for the Torso instead of 2D
+Using Liam's work here, experimenting with ROS2 Node Implmenetnation
 """
 
 import time
@@ -8,16 +8,18 @@ from collections import deque
 import cv2
 import numpy as np
 import pyrealsense2 as rs
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Bool
 from ultralytics import YOLO
 
 
 POSE_MODEL_PATH = "yolo11n-pose.pt"
-TORSO_FALLEN_DEG = 65.0     # torso angle-from-vertical considered "down"
-SUSTAIN_FRAMES = 10          # consecutive down-frames before confirming a fall
-STANDING_GRACE = 5           # consecutive up-frames to reset the counter (avoids
-                              # a single good frame mid-fall resetting everything)
-ALERT_COOLDOWN_SECONDS = 60  # matches Liam's alert cooldown
-ANGLE_SMOOTH_WINDOW = 5      # rolling mean window; raw per-frame angle is noisy
+TORSO_FALLEN_DEG = 65.0
+SUSTAIN_FRAMES = 10
+STANDING_GRACE = 5
+ALERT_COOLDOWN_SECONDS = 60
+ANGLE_SMOOTH_WINDOW = 5
 
 KEYPOINT_NAMES = [
     "nose", "left_eye", "right_eye", "left_ear", "right_ear",
@@ -59,11 +61,6 @@ def deproject_pixel(depth_frame, intrinsics, x, y, patch=2):
 
 
 def torso_angle_from_vertical(kp_xy, kp_conf, depth_frame, intrinsics, conf_thresh=0.3):
-    """
-    Simplified single-value version: average left/right shoulder->hip
-    angle from vertical, using whichever side has valid depth+confidence.
-    Returns None if nothing usable this frame.
-    """
     angles = []
     for side in ("left", "right"):
         sh_i = KP_INDEX[f"{side}_shoulder"]
@@ -89,17 +86,15 @@ def torso_angle_from_vertical(kp_xy, kp_conf, depth_frame, intrinsics, conf_thre
 
 
 def send_alert(message):
-    """
-    Placeholder alert channel -- console + timestamp for now. Swap this
-    for a Telegram call (reusing the pattern from Liam's send_tg_photo)
-    once the two-state logic itself is validated. Kept as its own
-    function specifically so that swap is a one-function change later.
-    """
     ts = time.strftime("%H:%M:%S")
     print(f"[ALERT {ts}] {message}")
 
 
 def main():
+    rclpy.init()
+    node = Node("fall_safety_node")
+    publisher = node.create_publisher(Bool, "/pose_safety/clear_to_move", 10)
+
     model = YOLO(POSE_MODEL_PATH)
     pipeline, align, depth_intrinsics = start_realsense()
 
@@ -109,10 +104,10 @@ def main():
     last_alert_time = 0.0
     angle_history = deque(maxlen=ANGLE_SMOOTH_WINDOW)
 
-    print("Live fall detection running. Press 'q' to quit.")
+    print("Live fall detection running (ROS2). Press 'q' to quit.")
 
     try:
-        while True:
+        while rclpy.ok():
             frames = pipeline.wait_for_frames()
             aligned = align.process(frames)
             color_frame = aligned.get_color_frame()
@@ -127,7 +122,7 @@ def main():
             state_this_frame = "STANDING"
 
             if results.keypoints is not None and len(results.keypoints) > 0:
-                kps = results.keypoints[0]  # single-person for this simple version
+                kps = results.keypoints[0]
                 kp_xy = kps.xy[0].cpu().numpy()
                 kp_conf = kps.conf[0].cpu().numpy() if kps.conf is not None else np.ones(len(kp_xy))
 
@@ -155,7 +150,11 @@ def main():
             else:
                 fall_confirmed = False
 
-          
+            # --- The one addition over live_fall_alert.py: publish to ROS2 ---
+            msg = Bool()
+            msg.data = (state_this_frame != "FALL DETECTED")
+            publisher.publish(msg)
+
             color = (0, 0, 255) if state_this_frame == "FALL DETECTED" else (0, 200, 0)
             cv2.putText(annotated, state_this_frame, (30, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 3)
@@ -163,13 +162,20 @@ def main():
                 cv2.putText(annotated, f"({down_frames}/{SUSTAIN_FRAMES})", (30, 90),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-            cv2.imshow("live_fall_alert", annotated)
+            cv2.imshow("fall_safety_node", annotated)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
+    except KeyboardInterrupt:
+        pass
     finally:
         pipeline.stop()
         cv2.destroyAllWindows()
+        node.destroy_node()
+        # rclpy's default SIGINT handler already shuts the context down
+        # before this runs, so guard against calling shutdown twice.
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":
