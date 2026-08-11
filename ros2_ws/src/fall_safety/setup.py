@@ -14,7 +14,7 @@ setup(
     install_requires=["setuptools"],
     zip_safe=True,
     maintainer="Aaran Patel",
-    maintainer_email="patelaarav2006@gmail.com",
+    maintainer_email="AARAV.PATEL.2026@mumail.ie",
     description="ROS2 node that detects falls from pose estimation and publishes a clear-to-move safety signal.",
     entry_points={
         "console_scripts": [
