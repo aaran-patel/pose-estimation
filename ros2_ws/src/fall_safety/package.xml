@@ -5,7 +5,7 @@
   <version>0.0.1</version>
   <description>ROS2 node that detects falls from pose estimation and publishes a clear-to-move safety signal.</description>
   <maintainer email="patelaarav2006@gmail.com">Aaran Patel</maintainer>
-  <license>MIT</license>
+  <license>TODO: License declaration</license>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>

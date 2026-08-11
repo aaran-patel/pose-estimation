@@ -16,7 +16,6 @@ setup(
     maintainer="Aaran Patel",
     maintainer_email="patelaarav2006@gmail.com",
     description="ROS2 node that detects falls from pose estimation and publishes a clear-to-move safety signal.",
-    license="MIT",
     entry_points={
         "console_scripts": [
             "fall_safety_node = fall_safety.live_fall_alert:main",
