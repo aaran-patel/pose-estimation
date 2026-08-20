@@ -6,6 +6,17 @@ The estimation for this project,
 
 - 12-8-26 Added some development and building packages so that the file can actually run on connected devices and software instead of having to run purely on the virtual environment. Can see more on changes.txt
 
+## Setup
+```bash
+cd ros2_ws
+colcon build
+source install/setup.bash
+```
+
 Run with 
-<br> source ~/venvs/aura/bin/activate <br>
-<br> ros2 run fall_safety fall_safety_node <br>
+```bash
+source /opt/ros/jazzy/setup.bash
+source ~/venvs/aura/bin/activate
+source ros2_ws/install/setup.bash
+ros2 run fall_safety fall_safety_node
+```
