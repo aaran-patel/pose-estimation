@@ -11,6 +11,7 @@ The estimation for this project,
 cd ros2_ws
 colcon build
 source install/setup.bash
+pip install requirements.txt
 ```
 
 Run with 
