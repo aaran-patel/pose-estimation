@@ -7,5 +7,5 @@ The estimation for this project,
 - 12-8-26 Added some development and building packages so that the file can actually run on connected devices and software instead of having to run purely on the virtual environment. Can see more on changes.txt
 
 Run with 
-source ~/venvs/aura/bin/activate
-ros2 run fall_safety fall_safety_node
+<br> source ~/venvs/aura/bin/activate <br>
+<br> ros2 run fall_safety fall_safety_node <br>
